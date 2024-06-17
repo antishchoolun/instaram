@@ -7,12 +7,9 @@ app = Flask(__name__)
 
 def download_instagram_image(profile_id):
     try:
-        # Dynamically set the base directory where images will be downloaded
-        script_directory = os.path.dirname(os.path.abspath(__file__))
-        base_directory = os.path.join(script_directory, 'downloaded')
+        # Set the base directory where images will be downloaded
+        base_directory = '/app/downloaded'
         
-        print(f"Base directory: {base_directory}")  # Print base directory for debugging
-
         # Ensure the directory exists
         if not os.path.exists(base_directory):
             os.makedirs(base_directory)
@@ -23,10 +20,8 @@ def download_instagram_image(profile_id):
         # Construct the command with the specified base directory
         command = [instaloader_path, '--dirname-pattern', base_directory, '--', f'-{profile_id}']
         
-        print(f"Running command: {' '.join(command)}")  # Print command for debugging
-        
         # Run the command
-        result = subprocess.run(command, capture_output=True, text=True, cwd=base_directory)
+        result = subprocess.run(command, capture_output=True, text=True, cwd='/app')
         
         # Check for errors
         if result.returncode == 0:
