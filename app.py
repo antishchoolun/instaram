@@ -11,6 +11,8 @@ def download_instagram_image(profile_id):
         script_directory = os.path.dirname(os.path.abspath(__file__))
         base_directory = os.path.join(script_directory, 'downloaded')
         
+        print(f"Base directory: {base_directory}")  # Print base directory for debugging
+
         # Ensure the directory exists
         if not os.path.exists(base_directory):
             os.makedirs(base_directory)
@@ -20,6 +22,8 @@ def download_instagram_image(profile_id):
 
         # Construct the command with the specified base directory
         command = [instaloader_path, '--dirname-pattern', base_directory, '--', f'-{profile_id}']
+        
+        print(f"Running command: {' '.join(command)}")  # Print command for debugging
         
         # Run the command
         result = subprocess.run(command, capture_output=True, text=True, cwd=base_directory)
@@ -31,8 +35,12 @@ def download_instagram_image(profile_id):
             images = [f for f in os.listdir(base_directory) if f.endswith('.jpg')]
             if images:
                 image_path = os.path.join(base_directory, images[0])
-                print(f"Downloaded image path: {image_path}")
-                return image_path
+                if os.path.exists(image_path):  # Check if the image file exists
+                    print(f"Downloaded image path: {image_path}")
+                    return image_path
+                else:
+                    print(f"Image file '{image_path}' does not exist.")
+                    return None
             else:
                 print("No image files found in the folder.")
                 return None
@@ -42,6 +50,7 @@ def download_instagram_image(profile_id):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return None
+
 
 @app.route('/')
 def hello():
