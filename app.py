@@ -8,10 +8,8 @@ app = Flask(__name__)
 def download_instagram_image(profile_id):
     try:
         # Set the base directory where images will be downloaded
-        script_directory = os.path.dirname(os.path.abspath(__file__))
-        base_directory = os.path.join(script_directory, 'downloaded')
+        base_directory = '/tmp/downloaded'  # Use /tmp for temporary files on Heroku
     
-        print(f"Script directory: {script_directory}")
         print(f"Base directory: {base_directory}")
         
         # Ensure the directory exists
@@ -61,3 +59,4 @@ def hello():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
