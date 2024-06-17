@@ -1,14 +1,12 @@
-# app.py
-import os
+import instaloader
 import subprocess
-from flask import Flask
-
-app = Flask(__name__)
+import os
 
 def download_instagram_image(profile_id):
     try:
-        # Set the base directory where images will be downloaded
-        base_directory = '/app/downloaded'
+        # Dynamically set the base directory where images will be downloaded
+        script_directory = os.path.dirname(os.path.abspath(__file__))
+        base_directory = os.path.join(script_directory, 'downloaded')
         
         # Ensure the directory exists
         if not os.path.exists(base_directory):
@@ -21,7 +19,7 @@ def download_instagram_image(profile_id):
         command = [instaloader_path, '--dirname-pattern', base_directory, '--', f'-{profile_id}']
         
         # Run the command
-        result = subprocess.run(command, capture_output=True, text=True, cwd='/app')
+        result = subprocess.run(command, capture_output=True, text=True, cwd=base_directory)
         
         # Check for errors
         if result.returncode == 0:
@@ -30,12 +28,8 @@ def download_instagram_image(profile_id):
             images = [f for f in os.listdir(base_directory) if f.endswith('.jpg')]
             if images:
                 image_path = os.path.join(base_directory, images[0])
-                if os.path.exists(image_path):  # Check if the image file exists
-                    print(f"Downloaded image path: {image_path}")
-                    return image_path
-                else:
-                    print(f"Image file '{image_path}' does not exist.")
-                    return None
+                print(f"Downloaded image path: {image_path}")
+                return image_path
             else:
                 print("No image files found in the folder.")
                 return None
@@ -46,15 +40,7 @@ def download_instagram_image(profile_id):
         print(f"An error occurred: {str(e)}")
         return None
 
-
-@app.route('/')
-def hello():
+# Example usage
+if __name__ == "__main__":
     profile_id = 'C8Ad5VAJWCQ'  # Replace with your desired profile ID
     downloaded_image_path = download_instagram_image(profile_id)
-    if downloaded_image_path:
-        return f"Image downloaded successfully. Path: {downloaded_image_path}"
-    else:
-        return "Failed to download image."
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
