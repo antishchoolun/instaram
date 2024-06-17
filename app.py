@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-import instaloader
 import subprocess
 import base64
 import io
@@ -16,7 +15,7 @@ def download_instagram_image(profile_id):
         image_buffer = io.BytesIO()
         
         # Construct the command to download the image
-        command = [instaloader_path, '-{profile_id}']
+        command = [instaloader_path, '--', f'-{profile_id}']
         
         # Run the command
         result = subprocess.run(command, capture_output=True)
@@ -55,4 +54,3 @@ def hello():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
