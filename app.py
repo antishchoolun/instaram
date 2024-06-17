@@ -1,61 +1,42 @@
-from flask import Flask, jsonify, send_file
-import subprocess
+from flask import Flask, request, jsonify
+import instaloader
 import base64
-import os
-import io
+import requests
 
 app = Flask(__name__)
 
 def download_instagram_image(profile_id):
     try:
-        # Full path to instaloader executable (adjust if needed)
-        instaloader_path = 'instaloader'  # Assuming instaloader is in the PATH
+        # Initialize instaloader
+        loader = instaloader.Instaloader()
+
+        # Fetch the post
+        post = instaloader.Post.from_shortcode(loader.context, profile_id)
+
+        # Download the image into memory
+        image_url = post.url
+        response = requests.get(image_url)
+        response.raise_for_status()  # Check for request errors
+        image_content = response.content
+
+        # Encode the image content as base64
+        base64_image = base64.b64encode(image_content).decode('utf-8')
         
-        # Directory where instaloader will download the image
-        download_directory = f'-{profile_id}'
-        
-        # Construct the command to download the image
-        command = [instaloader_path, '--', f'-{profile_id}']
-        
-        # Run the command
-        result = subprocess.run(command, capture_output=True)
-        
-        # Check for errors
-        if result.returncode == 0:
-            print(f"Image with profile ID '{profile_id}' downloaded successfully.")
-            
-            # Find the downloaded image file
-            image_path = find_downloaded_image(download_directory)
-            
-            if image_path:
-                return image_path
-            else:
-                print(f"No image file found in directory '{download_directory}'.")
-                return None
-        else:
-            print(f"Failed to download image. Error: {result.stderr}")
-            return None
+        return base64_image
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        return None
+        return str(e)
 
-def find_downloaded_image(directory):
-    # Function to find the downloaded image file in the specified directory
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file.endswith('.jpg'):
-                return os.path.join(root, file)
-    return None
+@app.route('/download_image', methods=['GET'])
+def download_image():
+    profile_id = request.args.get('profile_id')
+    if not profile_id:
+        return jsonify({"error": "profile_id parameter is required"}), 400
 
-@app.route('/')
-def hello():
-    profile_id = 'C8Ad5VAJWCQ'  # Replace with your desired profile ID
-    downloaded_image_path = download_instagram_image(profile_id)
-    if downloaded_image_path:
-        # Return the downloaded image file
-        return send_file(downloaded_image_path, mimetype='image/jpeg')
+    base64_image_data = download_instagram_image(profile_id)
+    if base64_image_data:
+        return jsonify({"base64_image": base64_image_data})
     else:
-        return "Failed to download image."
+        return jsonify({"error": "Failed to download or encode image"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
