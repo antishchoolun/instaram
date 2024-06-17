@@ -1,6 +1,9 @@
+from flask import Flask
 import instaloader
 import subprocess
 import os
+
+app = Flask(__name__)
 
 def download_instagram_image(profile_id):
     try:
