@@ -16,20 +16,20 @@ def download_instagram_image(profile_id):
         image_buffer = io.BytesIO()
         
         # Construct the command to download the image
-        command = [instaloader_path, '--no-videos', '--no-metadata-json', '--no-compress-json',
-                   '--no-captions', '--login=user', '--sessionid=sessionid', '-{profile_id}']
+        command = [instaloader_path, '-{profile_id}']
         
         # Run the command
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(command, capture_output=True)
         
         # Check for errors
         if result.returncode == 0:
             print(f"Image with profile ID '{profile_id}' downloaded successfully.")
             
             # Load the image into the buffer
-            image_buffer.seek(0)
+            image_buffer.write(result.stdout)
             
             # Read image content from buffer
+            image_buffer.seek(0)
             image_content = image_buffer.read()
             
             # Encode image content as base64
@@ -55,3 +55,4 @@ def hello():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
