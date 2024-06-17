@@ -2,9 +2,6 @@ import instaloader
 import subprocess
 import os
 
-import os
-import subprocess
-
 def download_instagram_image(profile_id):
     try:
         # Set the base directory where images will be downloaded
