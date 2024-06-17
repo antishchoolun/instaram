@@ -9,10 +9,10 @@ def download_instagram_image(profile_id):
     try:
         # Set the base directory where images will be downloaded
         script_directory = os.path.dirname(os.path.abspath(__file__))
-    base_directory = os.path.join(script_directory, 'downloaded')
+        base_directory = os.path.join(script_directory, 'downloaded')
     
-    print(f"Script directory: {script_directory}")
-    print(f"Base directory: {base_directory}")
+        print(f"Script directory: {script_directory}")
+        print(f"Base directory: {base_directory}")
         
         # Ensure the directory exists
         if not os.path.exists(base_directory):
