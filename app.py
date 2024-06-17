@@ -1,14 +1,15 @@
-from flask import Flask
+from flask import Flask, jsonify
 import instaloader
 import subprocess
 import os
+import base64
 
 app = Flask(__name__)
 
 def download_instagram_image(profile_id):
     try:
         # Set the base directory where images will be downloaded
-        base_directory = '/tmp/downloaded'  # Use /tmp for temporary files on Heroku
+        base_directory = '/tmp/downloaded'  # Use /tmp for temporary files
     
         print(f"Base directory: {base_directory}")
         
@@ -34,7 +35,16 @@ def download_instagram_image(profile_id):
                 image_path = os.path.join(base_directory, images[0])
                 if os.path.exists(image_path):  # Check if the image file exists
                     print(f"Downloaded image path: {image_path}")
-                    return image_path
+                    
+                    # Read image content and encode as base64
+                    with open(image_path, 'rb') as image_file:
+                        image_content = image_file.read()
+                        base64_image = base64.b64encode(image_content).decode('utf-8')
+                    
+                    # Clean up - delete the downloaded image file
+                    os.remove(image_path)
+                    
+                    return base64_image
                 else:
                     print(f"Image file '{image_path}' does not exist.")
                     return None
@@ -51,12 +61,12 @@ def download_instagram_image(profile_id):
 @app.route('/')
 def hello():
     profile_id = 'C8Ad5VAJWCQ'  # Replace with your desired profile ID
-    downloaded_image_path = download_instagram_image(profile_id)
-    if downloaded_image_path:
-        return f"Image downloaded successfully. Path: {downloaded_image_path}"
+    base64_image_data = download_instagram_image(profile_id)
+    if base64_image_data:
+        # Return base64 image data as JSON response
+        return jsonify({"image_data": base64_image_data})
     else:
         return "Failed to download image."
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
