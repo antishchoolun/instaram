@@ -1,10 +1,7 @@
-from flask import Flask
+# app.py
 
-app = Flask(__name__)
+def main():
+    print("Hello, Heroku!")
 
-@app.route('/')
-def hello():
-    return 'Hello, World!'
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    main()
