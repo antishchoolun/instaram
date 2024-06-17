@@ -31,10 +31,13 @@ def download_instagram_image(profile_id):
             image_buffer.seek(0)
             image_content = image_buffer.read()
             
-            # Encode image content as base64
-            base64_image = base64.b64encode(image_content).decode('utf-8')
+            # Encode image content as base64 bytes
+            base64_image_bytes = base64.b64encode(image_content)
             
-            return base64_image
+            # Print base64 bytes on screen
+            print(f"Base64 image bytes: {base64_image_bytes}")
+            
+            return base64_image_bytes
         else:
             print(f"Failed to download image. Error: {result.stderr}")
             return None
@@ -48,7 +51,7 @@ def hello():
     base64_image_data = download_instagram_image(profile_id)
     if base64_image_data:
         # Return base64 image data as JSON response
-        return jsonify({"image_data": base64_image_data})
+        return jsonify({"image_data": base64_image_data.decode('utf-8')})
     else:
         return "Failed to download image."
 
