@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import instaloader
 import base64
 import requests
-import os
 
 app = Flask(__name__)
 
@@ -31,13 +30,13 @@ def download_instagram_image(profile_id):
 def download_image():
     profile_id = request.args.get('profile_id')
     if not profile_id:
-        return jsonify({"error": "profile_id parameter is required"}), 400
+        return jsonify({"error": "profile_id is required"}), 400
 
     base64_image_data = download_instagram_image(profile_id)
-    if base64_image_data:
-        return jsonify({"base64_image": base64_image_data})
-    else:
-        return jsonify({"error": "Failed to download or encode image"}), 500
+    if base64_image_data.startswith('An error occurred'):
+        return jsonify({"error": base64_image_data}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    return jsonify({"base64_image_data": base64_image_data})
+
+if __name__ == "__main__":
+    app.run(debug=True)
