@@ -5,10 +5,15 @@ import requests
 
 app = Flask(__name__)
 
+# Hardcoded Instagram credentials
+INSTAGRAM_USERNAME = 'eslrustler@gmail.com'
+INSTAGRAM_PASSWORD = 'randompassword'
+
 def download_instagram_image(profile_id):
     try:
-        # Initialize instaloader
+        # Initialize instaloader and log in
         loader = instaloader.Instaloader()
+        loader.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
 
         # Fetch the post
         post = instaloader.Post.from_shortcode(loader.context, profile_id)
