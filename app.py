@@ -5,15 +5,26 @@ import requests
 
 app = Flask(__name__)
 
-# Hardcoded Instagram credentials
-INSTAGRAM_USERNAME = 'eslrustler@gmail.com'
-INSTAGRAM_PASSWORD = 'randompassword'
+# GitHub raw session file URL
+SESSION_FILE_URL = 'https://github.com/antishchoolun/instaram/raw/master/session'
+
+def download_session_file_from_github():
+    response = requests.get(SESSION_FILE_URL)
+    if response.status_code == 200:
+        with open('session_file', 'wb') as f:
+            f.write(response.content)
+        return 'session_file'
+    else:
+        return f"Failed to download session file: {response.status_code} - {response.reason}"
 
 def download_instagram_image(profile_id):
     try:
-        # Initialize instaloader and log in
+        # Download session file from GitHub
+        session_file_path = download_session_file_from_github()
+
+        # Initialize instaloader and load the session
         loader = instaloader.Instaloader()
-        loader.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
+        loader.load_session_from_file('your_instagram_username', session_file_path)
 
         # Fetch the post
         post = instaloader.Post.from_shortcode(loader.context, profile_id)
